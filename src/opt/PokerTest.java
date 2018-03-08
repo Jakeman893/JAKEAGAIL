@@ -24,6 +24,7 @@ import java.util.*;
 public class PokerTest {
 
 
+  
 
   /* Dataset Params */
   /**
@@ -35,10 +36,10 @@ public class PokerTest {
   private static final String FILENAME = "src/opt/test/data.csv";
 
   //  TODO: How many examples you have
-  private static int num_examples = 51;
+  private static int num_examples = 1599;
 
   //  TODO: How many attributes you have. This is (number_of_columns - 1)
-  private static int num_attributes = 7;
+  private static int num_attributes = 11;
 
 
   /* Randomization */
@@ -80,7 +81,7 @@ public class PokerTest {
    * process is lengthy, you don't want to repeat it often. Do it once, record the value, and
    * place the value for numberHiddenLayerNodes.
    */
-  private static final boolean shouldFindNNParams = false;
+  private static final boolean shouldFindNNParams = true;
   private static int numberHiddenLayerNodes = 30;
 
 
@@ -91,7 +92,7 @@ public class PokerTest {
    * through until the best param configuration for simulated annealing is found.
    */
 //  TODO: Set this to false if you retained the best SA params from a previous run
-  private static final boolean shouldFindSAParams = false;
+  private static final boolean shouldFindSAParams = true;
   // TODO: Modify these to try different possible temp and cooling params
   private static double[] temps = {1e5, 1E8, 1E10, 1E12, 1E15};
   private static double[] coolingRates = {0.9, 0.95, 0.99, 0.999};
@@ -110,7 +111,7 @@ public class PokerTest {
    * NOTE: min(populationRations) >= max(mateRatios) + max(toMutateRatio)
    * This condition must be upheld or Exceptions will be thrown later in the script
    */
-  private static final boolean shouldFindGAParams = false;
+  private static final boolean shouldFindGAParams = true;
   private static double[] populationRatios = {0.10, 0.15, 0.20, 0.25};
   private static double[] mateRatios = {0.02, 0.04};
   private static double[] mutateRatios = {0.02, 0.04};
@@ -248,6 +249,8 @@ public class PokerTest {
 
         validationErrors[i] = evaluateNetwork(backpropNet, validation);
       }
+
+      System.out.print(validationErrors);
 
 //      Find the average error for this network configuration
       double error = 0;
@@ -397,6 +400,8 @@ public class PokerTest {
           validationErrors[i] = evaluateNetwork(backpropNet, validation);
         }
 
+        System.out.print(validationErrors);
+
 //      Find the average error for this network configuration
         double error = 0;
         for (int j = 0; j < validationErrors.length; j++) {
@@ -511,6 +516,8 @@ public class PokerTest {
 
             validationErrors[i] = evaluateNetwork(backpropNet, validation);
           }
+
+        System.out.print(validationErrors);
 
 //      Find the average error for this configuration
           double error = 0;

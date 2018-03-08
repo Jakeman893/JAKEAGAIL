@@ -59,6 +59,6 @@ def process_dataset(filename, outname):
 
 
 if __name__ == '__main__':
-    filename = '~/seaborn-data/car_crashes.csv'  # Which file you're reading from
+    filename = 'src/opt/test/data.csv'  # Which file you're reading from
     outname = 'src/opt/test/data.csv'  # Name of the file to write to (erases if already exists)
     process_dataset(filename, outname)
