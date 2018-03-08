@@ -74,6 +74,8 @@ public class MaxKColoringTest {
         Distribution df = new DiscreteDependencyTree(.1); 
         ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
         
+        System.out.println("===========RHC=========");
+
         long starttime = System.currentTimeMillis();
         RandomizedHillClimbing rhc = new RandomizedHillClimbing(hcp);      
         FixedIterationTrainer fit = new FixedIterationTrainer(rhc, 20000);
@@ -82,7 +84,7 @@ public class MaxKColoringTest {
         System.out.println(ef.foundConflict());
         System.out.println("Time : "+ (System.currentTimeMillis() - starttime));
         
-        System.out.println("============================");
+        System.out.println("===========Simulated Annealing=========");
         
         starttime = System.currentTimeMillis();
         SimulatedAnnealing sa = new SimulatedAnnealing(1E12, .1, hcp);
@@ -92,7 +94,7 @@ public class MaxKColoringTest {
         System.out.println(ef.foundConflict());
         System.out.println("Time : "+ (System.currentTimeMillis() - starttime));
         
-        System.out.println("============================");
+        System.out.println("===========Genetic Algorithm=========");
         
         starttime = System.currentTimeMillis();
         StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(200, 10, 60, gap);
@@ -102,7 +104,7 @@ public class MaxKColoringTest {
         System.out.println(ef.foundConflict());
         System.out.println("Time : "+ (System.currentTimeMillis() - starttime));
         
-        System.out.println("============================");
+        System.out.println("===========MIMIC=========");
         
         starttime = System.currentTimeMillis();
         MIMIC mimic = new MIMIC(200, 100, pop);

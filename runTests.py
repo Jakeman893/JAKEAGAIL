@@ -6,7 +6,7 @@ save_dir = "logs/"
 
 names = ['Abalone', 'ContinuousPeaks', 'CountOnes', 'CrossValidation',
          'FlipFlop', 'FourPeaks', 'Knapsack', 'MaxKColoring', 'NQueens',
-         'TravelingSalesman', 'TwoColors', 'XOR', 'Wine', 'Student']
+         'TravelingSalesman', 'TwoColors', 'Wine', 'Student']
 
 if len(sys.argv) > 1:
     names=sys.argv[1:]

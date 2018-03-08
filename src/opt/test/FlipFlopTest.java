@@ -47,22 +47,30 @@ public class FlipFlopTest {
         HillClimbingProblem hcp = new GenericHillClimbingProblem(ef, odd, nf);
         GeneticAlgorithmProblem gap = new GenericGeneticAlgorithmProblem(ef, odd, mf, cf);
         ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
-        
+
+        System.out.println("===========RHC=========");
+
         RandomizedHillClimbing rhc = new RandomizedHillClimbing(hcp);      
         FixedIterationTrainer fit = new FixedIterationTrainer(rhc, 200000);
         fit.train();
         System.out.println(ef.value(rhc.getOptimal()));
         
+        System.out.println("===========Simulated Annealing=========");
+
         SimulatedAnnealing sa = new SimulatedAnnealing(100, .95, hcp);
         fit = new FixedIterationTrainer(sa, 200000);
         fit.train();
         System.out.println(ef.value(sa.getOptimal()));
         
+        System.out.println("===========Genetic Algorithm=========");
+
         StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(200, 100, 20, gap);
         fit = new FixedIterationTrainer(ga, 1000);
         fit.train();
         System.out.println(ef.value(ga.getOptimal()));
         
+        System.out.println("===========MIMIC=========");
+
         MIMIC mimic = new MIMIC(200, 5, pop);
         fit = new FixedIterationTrainer(mimic, 1000);
         fit.train();

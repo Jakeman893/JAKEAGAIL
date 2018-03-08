@@ -53,7 +53,9 @@ public class NQueensTest {
         HillClimbingProblem hcp = new GenericHillClimbingProblem(ef, odd, nf);
         GeneticAlgorithmProblem gap = new GenericGeneticAlgorithmProblem(ef, odd, mf, cf);
         ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
-        
+
+        System.out.println("===========RHC=========");
+
         RandomizedHillClimbing rhc = new RandomizedHillClimbing(hcp);      
         FixedIterationTrainer fit = new FixedIterationTrainer(rhc, 100);
         fit.train();
@@ -63,7 +65,7 @@ public class NQueensTest {
         System.out.println(ef.boardPositions());
         System.out.println("Time : "+ (System.currentTimeMillis() - starttime));
         
-        System.out.println("============================");
+        System.out.println("===========Simulated Annealing=========");
         
         SimulatedAnnealing sa = new SimulatedAnnealing(1E1, .1, hcp);
         fit = new FixedIterationTrainer(sa, 100);
@@ -75,7 +77,7 @@ public class NQueensTest {
         System.out.println(ef.boardPositions());
         System.out.println("Time : "+ (System.currentTimeMillis() - starttime));
         
-        System.out.println("============================");
+        System.out.println("===========Genetic Algorithm=========");
         
         starttime = System.currentTimeMillis();
         StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(200, 0, 10, gap);
@@ -86,7 +88,7 @@ public class NQueensTest {
         System.out.println(ef.boardPositions());
         System.out.println("Time : "+ (System.currentTimeMillis() - starttime));
         
-        System.out.println("============================");
+        System.out.println("===========MIMIC=========");
         
         starttime = System.currentTimeMillis();
         MIMIC mimic = new MIMIC(200, 10, pop);
