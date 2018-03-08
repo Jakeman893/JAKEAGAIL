@@ -37,7 +37,7 @@ public class WineTest {
    */
 
 //  TODO: Your dataset filename. Expected format is CSV
-  private static final String FILENAME = "src/opt/test/wine_changed.csv";
+  private static final String FILENAME = "datasets/wine_changed.csv";
 
   //  TODO: How many examples you have
   private static int num_examples = 1599;
@@ -254,7 +254,7 @@ public class WineTest {
         validationErrors[i] = evaluateNetwork(backpropNet, validation);
       }
 
-      System.out.print(validationErrors);
+      System.out.print(Arrays.toString(validationErrors));
 
 //      Find the average error for this network configuration
       double error = 0;
@@ -404,7 +404,7 @@ public class WineTest {
           validationErrors[i] = evaluateNetwork(backpropNet, validation);
         }
 
-        System.out.print(validationErrors);
+        System.out.print(Arrays.toString(validationErrors));
 
 //      Find the average error for this network configuration
         double error = 0;
@@ -521,7 +521,7 @@ public class WineTest {
             validationErrors[i] = evaluateNetwork(backpropNet, validation);
           }
 
-        System.out.print(validationErrors);
+        System.out.print(Arrays.toString(validationErrors));
 
 //      Find the average error for this configuration
           double error = 0;

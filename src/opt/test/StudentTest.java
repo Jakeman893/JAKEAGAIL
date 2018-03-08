@@ -254,7 +254,7 @@ public class StudentTest {
         validationErrors[i] = evaluateNetwork(backpropNet, validation);
       }
 
-      System.out.print(validationErrors);
+      System.out.print(Arrays.toString(validationErrors));
 
 //      Find the average error for this network configuration
       double error = 0;
@@ -404,7 +404,7 @@ public class StudentTest {
           validationErrors[i] = evaluateNetwork(backpropNet, validation);
         }
 
-        System.out.print(validationErrors);
+        System.out.printArrays.toString(validationErrors);
 
 //      Find the average error for this network configuration
         double error = 0;
@@ -521,7 +521,7 @@ public class StudentTest {
             validationErrors[i] = evaluateNetwork(backpropNet, validation);
           }
 
-        System.out.print(validationErrors);
+        System.out.printArrays.toString(validationErrors);
 
 //      Find the average error for this configuration
           double error = 0;
