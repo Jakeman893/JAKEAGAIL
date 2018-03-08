@@ -34,6 +34,12 @@ import shared.FixedIterationTrainer;
 public class TravelingSalesmanTest {
     /** The n value */
     private static final int N = 50;
+
+    public static void printArray(double matrix[][]) {
+        for (double[] row : matrix) 
+            System.out.println(Arrays.toString(row));       
+    }
+
     /**
      * The test main
      * @param args ignored
@@ -46,6 +52,9 @@ public class TravelingSalesmanTest {
             points[i][0] = random.nextDouble();
             points[i][1] = random.nextDouble();   
         }
+
+        printArray(points);
+
         // for rhc, sa, and ga we use a permutation based encoding
         TravelingSalesmanEvaluationFunction ef = new TravelingSalesmanRouteEvaluationFunction(points);
         Distribution odd = new DiscretePermutationDistribution(N);
@@ -55,21 +64,25 @@ public class TravelingSalesmanTest {
         HillClimbingProblem hcp = new GenericHillClimbingProblem(ef, odd, nf);
         GeneticAlgorithmProblem gap = new GenericGeneticAlgorithmProblem(ef, odd, mf, cf);
         
+        System.out.println("===========Randomized Hill Climbing=========");
         RandomizedHillClimbing rhc = new RandomizedHillClimbing(hcp);      
         FixedIterationTrainer fit = new FixedIterationTrainer(rhc, 200000);
         fit.train();
         System.out.println(ef.value(rhc.getOptimal()));
         
+        System.out.println("===========Simulated Annealing=========");
         SimulatedAnnealing sa = new SimulatedAnnealing(1E12, .95, hcp);
         fit = new FixedIterationTrainer(sa, 200000);
         fit.train();
         System.out.println(ef.value(sa.getOptimal()));
         
+        System.out.println("===========Genetic Algorithm=========");
         StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(200, 150, 20, gap);
         fit = new FixedIterationTrainer(ga, 1000);
         fit.train();
         System.out.println(ef.value(ga.getOptimal()));
         
+        System.out.println("===========MIMIC=========");
         // for mimic we use a sort encoding
         ef = new TravelingSalesmanSortEvaluationFunction(points);
         int[] ranges = new int[N];

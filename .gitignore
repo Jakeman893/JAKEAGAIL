@@ -12,3 +12,4 @@ manifest.mf
 
 *.java~
 datasets/
+logs/
