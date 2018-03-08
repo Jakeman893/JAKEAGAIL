@@ -58,10 +58,10 @@ public class MaxKColoringTest {
             	 vertex.getAadjacencyColorMatrix().add(random.nextInt(N*L));
             }
         }
-        /*for (int i = 0; i < N; i++) {
+        for (int i = 0; i < N; i++) {
             Vertex vertex = vertices[i];
             System.out.println(Arrays.toString(vertex.getAadjacencyColorMatrix().toArray()));
-        }*/
+        }
         // for rhc, sa, and ga we use a permutation based encoding
         MaxKColorFitnessFunction ef = new MaxKColorFitnessFunction(vertices);
         Distribution odd = new DiscretePermutationDistribution(K);

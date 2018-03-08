@@ -5,8 +5,12 @@ import func.nn.backprop.BackPropagationNetworkFactory;
 import func.nn.backprop.BatchBackPropagationTrainer;
 import func.nn.backprop.RPROPUpdateRule;
 import opt.OptimizationAlgorithm;
+import opt.HillClimbingProblem;
 import opt.RandomizedHillClimbing;
 import opt.SimulatedAnnealing;
+import opt.prob.GenericProbabilisticOptimizationProblem;
+import opt.prob.MIMIC;
+import opt.prob.ProbabilisticOptimizationProblem;
 import opt.example.NeuralNetworkOptimizationProblem;
 import opt.ga.StandardGeneticAlgorithm;
 import shared.*;
@@ -605,7 +609,6 @@ public class PokerTest {
     time_elapsed /= Math.pow(10,9);
     System.out.printf("Time Elapsed: %s s %n", df.format(time_elapsed));
   }
-
 
   /**
    * Train a given optimization problem for a given number of iterations. Called by RHC, SA, and
