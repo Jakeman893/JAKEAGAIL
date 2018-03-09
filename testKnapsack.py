@@ -23,9 +23,9 @@ else:
 
 data = {'a': [], 'n': [], 'c': [], 'max_val': [], 'max_weight': [], 'score': []}
 
-for a in xrange(0, 4):
-    for n in xrange(10, maxN+1, 10):
-        for c in xrange(0, 5):
+for a in range(0, 4):
+    for n in range(10, maxN+1, 10):
+        for c in range(0, 5):
             # for max_val in xrange(0,50, 5):
             #     for max_weight in xrange(0,50,5):
             print(str(a) + '\t' + str(n) + '\t' + str(c) + '\t' + str(max_val) + '\t' + str(max_weight))

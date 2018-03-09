@@ -10,7 +10,7 @@ args = {}
 maxN = 10
 
 if len(sys.argv) > 1:
-    for i in xrange(1, len(sys.argv)):
+    for i in range(1, len(sys.argv)):
         if '-maxN' in sys.argv[i]:
             maxN = int(sys.argv[i+1])
 else:
@@ -18,9 +18,9 @@ else:
 
 data = {'a': [], 'N': [], 't': [], 'score': []}
 
-for a in xrange(0, 4):
-    for N in xrange(10, maxN+1, 10):
-        for t in xrange(0, N, 5):
+for a in range(0, 4):
+    for N in range(10, maxN+1, 10):
+        for t in range(0, N, 5):
             print(str(a) + '\t' + str(N) + '\t' + str(t))
             data['a'].append(algs[a])
             data['N'].append(N)
