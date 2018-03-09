@@ -8,9 +8,11 @@ algs = ['RHC', 'SA', 'GA', 'MIMIC']
 
 args = {}
 maxN = 10
+max_val = 50
+max_weight = 50
 
 if len(sys.argv) > 1:
-    for i in xrange(1, len(sys.argv)):
+    for i in range(1, len(sys.argv)):
         if '-maxN' in sys.argv[i]:
             maxN = int(sys.argv[i+1])
         elif '-maxVal' in sys.argv[i]:
