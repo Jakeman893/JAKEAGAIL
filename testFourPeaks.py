@@ -16,7 +16,7 @@ if len(sys.argv) > 1:
 else:
     exit()
 
-data = {'a': [], 'N': [], 't': [], 'score': []}
+data = {'a': [], 'N': [], 't': [], 'time': [], 'score': []}
 
 for a in range(0, 4):
     for N in range(10, maxN+1, 10):
