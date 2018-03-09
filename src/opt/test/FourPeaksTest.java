@@ -32,49 +32,86 @@ import shared.FixedIterationTrainer;
  */
 public class FourPeaksTest {
     /** The n value */
-    private static final int N = 200;
+    private static int N = 200;
     /** The t value */
-    private static final int T = N / 5;
+    private static int T = N / 5;
     
     public static void main(String[] args) {
+        int alg = 4;
+        for (int i = 0; i < args.length; i++) {
+            String s = args[i];
+            if (s.equalsIgnoreCase("-t")) {
+                T = Integer.parseInt(args[i+1]); 
+            } else if (s.equalsIgnoreCase("-N")) {
+                N = Integer.parseInt(args[i+1]);
+            } else if (s.equalsIgnoreCase("-a")){
+                alg = Integer.parseInt(args[i+1]);
+            }
+        }
         int[] ranges = new int[N];
         Arrays.fill(ranges, 2);
         EvaluationFunction ef = new FourPeaksEvaluationFunction(T);
         Distribution odd = new DiscreteUniformDistribution(ranges);
         NeighborFunction nf = new DiscreteChangeOneNeighbor(ranges);
-        MutationFunction mf = new DiscreteChangeOneMutation(ranges);
-        CrossoverFunction cf = new SingleCrossOver();
         Distribution df = new DiscreteDependencyTree(.1, ranges); 
         HillClimbingProblem hcp = new GenericHillClimbingProblem(ef, odd, nf);
-        GeneticAlgorithmProblem gap = new GenericGeneticAlgorithmProblem(ef, odd, mf, cf);
-        ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
         
-        System.out.println("===========RHC=========");
-
+        switch(alg) {
+            case 0:
+                RHC_funct(ef, hcp);
+                break;
+            case 1:
+                SA_funct(ef, hcp);
+                break;
+            case 2:
+                GA_funct(ef, odd, df, ranges);
+                break;
+            case 3:
+                MIMIC_funct(ef, odd, df);
+                break;
+            case 4:
+                RHC_funct(ef, hcp);
+                SA_funct(ef, hcp);
+                GA_funct(ef, odd, df, ranges);
+                MIMIC_funct(ef, odd, df);
+                break;
+        }
+    }
+    private static void RHC_funct(EvaluationFunction ef, HillClimbingProblem hcp) {
         RandomizedHillClimbing rhc = new RandomizedHillClimbing(hcp);      
         FixedIterationTrainer fit = new FixedIterationTrainer(rhc, 200000);
         fit.train();
-        System.out.println("RHC: " + ef.value(rhc.getOptimal()));
-        
-        System.out.println("===========Simulated Annealing=========");
-
-        SimulatedAnnealing sa = new SimulatedAnnealing(1E11, .95, hcp);
-        fit = new FixedIterationTrainer(sa, 200000);
-        fit.train();
-        System.out.println("SA: " + ef.value(sa.getOptimal()));
-        
-        System.out.println("===========Genetic Algorithm=========");
-
-        StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(200, 100, 10, gap);
-        fit = new FixedIterationTrainer(ga, 1000);
-        fit.train();
-        System.out.println("GA: " + ef.value(ga.getOptimal()));
-        
-        System.out.println("===========MIMIC=========");
-
-        MIMIC mimic = new MIMIC(200, 20, pop);
-        fit = new FixedIterationTrainer(mimic, 1000);
-        fit.train();
-        System.out.println("MIMIC: " + ef.value(mimic.getOptimal()));
+        // System.out.println("RHC: " + ef.value(rhc.getOptimal()));    
+        System.out.println(ef.value(rhc.getOptimal()));    
     }
+
+    private static void SA_funct(EvaluationFunction ef, HillClimbingProblem hcp) {
+        SimulatedAnnealing sa = new SimulatedAnnealing(1E11, .95, hcp);
+        FixedIterationTrainer fit = new FixedIterationTrainer(sa, 200000);
+        fit.train();
+        // System.out.println("SA: " + ef.value(sa.getOptimal()));
+        System.out.println(ef.value(sa.getOptimal()));
+    }
+
+    private static void MIMIC_funct(EvaluationFunction ef, Distribution odd, Distribution df) {
+        ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
+        MIMIC mimic = new MIMIC(200, 20, pop);
+        FixedIterationTrainer fit = new FixedIterationTrainer(mimic, 1000);
+        fit.train();
+        // System.out.println("MIMIC: " + ef.value(mimic.getOptimal()));
+        System.out.println(ef.value(mimic.getOptimal()));
+    }
+
+    private static void GA_funct(EvaluationFunction ef, Distribution odd, Distribution df, int[] ranges) {
+        MutationFunction mf = new DiscreteChangeOneMutation(ranges);
+        CrossoverFunction cf = new SingleCrossOver();
+
+        GeneticAlgorithmProblem gap = new GenericGeneticAlgorithmProblem(ef, odd, mf, cf);
+        StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(200, 100, 10, gap);
+        FixedIterationTrainer fit = new FixedIterationTrainer(ga, 1000);
+        fit.train();
+        // System.out.println("GA: " + ef.value(ga.getOptimal()));
+        System.out.println(ef.value(ga.getOptimal()));
+    }
+
 }

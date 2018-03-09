@@ -40,24 +40,42 @@ import shared.FixedIterationTrainer;
  */
 public class KnapsackTest {
     /** Random number generator */
-    private static final Random random = new Random();
+    private static Random random = new Random();
     /** The number of items */
-    private static final int NUM_ITEMS = 40;
+    private static int NUM_ITEMS = 40;
     /** The number of copies each */
-    private static final int COPIES_EACH = 4;
+    private static int COPIES_EACH = 4;
     /** The maximum value for a single element */
-    private static final double MAX_VALUE = 50;
+    private static double MAX_VALUE = 50;
     /** The maximum weight for a single element */
-    private static final double MAX_WEIGHT = 50;
+    private static double MAX_WEIGHT = 50;
     /** The maximum weight for the knapsack */
-    private static final double MAX_KNAPSACK_WEIGHT =
-         MAX_WEIGHT * NUM_ITEMS * COPIES_EACH * .4;
+    private static double MAX_KNAPSACK_WEIGHT = 0;
 
     /**
      * The test main
      * @param args ignored
      */
     public static void main(String[] args) {
+
+        int alg = 4;
+        for (int i = 0; i < args.length; i++) {
+            String s = args[i];
+            if (s.equalsIgnoreCase("-n")) {
+                NUM_ITEMS = Integer.parseInt(args[i+1]); 
+            } else if (s.equalsIgnoreCase("-c")) {
+                COPIES_EACH = Integer.parseInt(args[i+1]);
+            } else if (s.equalsIgnoreCase("-max_val")) {
+                MAX_VALUE = Integer.parseInt(args[i+1]);
+            } else if (s.equalsIgnoreCase("-max_weight")) {
+                MAX_WEIGHT = Integer.parseInt(args[i+1]);
+            } else if (s.equalsIgnoreCase("-a")){
+                alg = Integer.parseInt(args[i+1]);
+            }
+        }
+
+        MAX_KNAPSACK_WEIGHT = MAX_WEIGHT * NUM_ITEMS * COPIES_EACH * .4;
+
         int[] copies = new int[NUM_ITEMS];
         Arrays.fill(copies, COPIES_EACH);
         double[] values = new double[NUM_ITEMS];
@@ -81,33 +99,63 @@ public class KnapsackTest {
         GeneticAlgorithmProblem gap = new GenericGeneticAlgorithmProblem(ef, odd, mf, cf);
         ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
         
-        System.out.println("===========RHC=========");
+        switch(alg) {
+            case 0:
+                RHC_funct(ef, hcp);
+                break;
+            case 1:
+                SA_funct(ef, hcp);
+                break;
+            case 2:
+                GA_funct(ef, odd, df, ranges);
+                break;
+            case 3:
+                MIMIC_funct(ef, odd, df);
+                break;
+            case 4:
+                RHC_funct(ef, hcp);
+                SA_funct(ef, hcp);
+                GA_funct(ef, odd, df, ranges);
+                MIMIC_funct(ef, odd, df);
+                break;
+        }
+    }
 
+    private static void RHC_funct(EvaluationFunction ef, HillClimbingProblem hcp) {
         RandomizedHillClimbing rhc = new RandomizedHillClimbing(hcp);      
         FixedIterationTrainer fit = new FixedIterationTrainer(rhc, 200000);
         fit.train();
-        System.out.println(ef.value(rhc.getOptimal()));
-        
-        System.out.println("===========Simulated Annealing=========");
+        // System.out.println("RHC: " + ef.value(rhc.getOptimal()));    
+        System.out.println(ef.value(rhc.getOptimal()));    
+    }
 
+    private static void SA_funct(EvaluationFunction ef, HillClimbingProblem hcp) {
         SimulatedAnnealing sa = new SimulatedAnnealing(100, .95, hcp);
-        fit = new FixedIterationTrainer(sa, 200000);
+        FixedIterationTrainer fit = new FixedIterationTrainer(sa, 200000);
         fit.train();
+        // System.out.println("SA: " + ef.value(sa.getOptimal()));
         System.out.println(ef.value(sa.getOptimal()));
-        
-        System.out.println("===========Genetic Algorithm=========");
+    }
 
-        StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(200, 150, 25, gap);
-        fit = new FixedIterationTrainer(ga, 1000);
+    private static void MIMIC_funct(EvaluationFunction ef, Distribution odd, Distribution df) {
+        ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
+        MIMIC mimic = new MIMIC(200, 20, pop);
+        FixedIterationTrainer fit = new FixedIterationTrainer(mimic, 1000);
         fit.train();
-        System.out.println(ef.value(ga.getOptimal()));
-        
-        System.out.println("===========MIMIC=========");
-
-        MIMIC mimic = new MIMIC(200, 100, pop);
-        fit = new FixedIterationTrainer(mimic, 1000);
-        fit.train();
+        // System.out.println("MIMIC: " + ef.value(mimic.getOptimal()));
         System.out.println(ef.value(mimic.getOptimal()));
+    }
+
+    private static void GA_funct(EvaluationFunction ef, Distribution odd, Distribution df, int[] ranges) {
+        MutationFunction mf = new DiscreteChangeOneMutation(ranges);
+        CrossoverFunction cf = new UniformCrossOver();
+
+        GeneticAlgorithmProblem gap = new GenericGeneticAlgorithmProblem(ef, odd, mf, cf);
+        StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(200, 100, 10, gap);
+        FixedIterationTrainer fit = new FixedIterationTrainer(ga, 1000);
+        fit.train();
+        // System.out.println("GA: " + ef.value(ga.getOptimal()));
+        System.out.println(ef.value(ga.getOptimal()));
     }
 
 }

@@ -85,8 +85,8 @@ public class StudentTest {
    * process is lengthy, you don't want to repeat it often. Do it once, record the value, and
    * place the value for numberHiddenLayerNodes.
    */
-  private static final boolean shouldFindNNParams = true;
-  private static int numberHiddenLayerNodes = 30;
+  private static final boolean shouldFindNNParams = false;
+  private static int numberHiddenLayerNodes = 3;
 
 
   /* Simulated Annealing */
@@ -96,14 +96,14 @@ public class StudentTest {
    * through until the best param configuration for simulated annealing is found.
    */
 //  TODO: Set this to false if you retained the best SA params from a previous run
-  private static final boolean shouldFindSAParams = true;
+  private static final boolean shouldFindSAParams = false;
   // TODO: Modify these to try different possible temp and cooling params
   private static double[] temps = {1e5, 1E8, 1E10, 1E12, 1E15};
   private static double[] coolingRates = {0.9, 0.95, 0.99, 0.999};
 
   //  TODO: Place values here from previous run if you set shouldFindSAParams to false.
-  private static double best_temp = 1E12;
-  private static double best_cooling = 0.95;
+  private static double best_temp = 1E5;
+  private static double best_cooling = 0.90;
 
 
   /* Genetic Algorithms */
@@ -115,15 +115,15 @@ public class StudentTest {
    * NOTE: min(populationRations) >= max(mateRatios) + max(toMutateRatio)
    * This condition must be upheld or Exceptions will be thrown later in the script
    */
-  private static final boolean shouldFindGAParams = true;
+  private static final boolean shouldFindGAParams = false;
   private static double[] populationRatios = {0.10, 0.15, 0.20, 0.25};
   private static double[] mateRatios = {0.02, 0.04};
   private static double[] mutateRatios = {0.02, 0.04};
 
   //  TODO: Place values here from previous run if you set shouldFindGAParams to false
-  private static double populationRatio = 0.25;
-  private static double toMateRatio = 0.02;
-  private static double toMutateRatio = 0.02;
+  private static double populationRatio = 0.250;
+  private static double toMateRatio = 0.040;
+  private static double toMutateRatio = 0.020;
 
 
   /* Other global vars - Don't mess with these unless you have a reason to */
