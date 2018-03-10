@@ -35,6 +35,8 @@ public class FourPeaksTest {
     private static int N = 200;
     /** The t value */
     private static int T = N / 5;
+
+    private static int iters = 1000;
     
     public static void main(String[] args) {
         int alg = 4;
@@ -46,6 +48,8 @@ public class FourPeaksTest {
                 N = Integer.parseInt(args[i+1]);
             } else if (s.equalsIgnoreCase("-a")){
                 alg = Integer.parseInt(args[i+1]);
+            } else if (s.equalsIgnoreCase("-i")){
+                iters = Integer.parseInt(args[i+1]);
             }
         }
         int[] ranges = new int[N];
@@ -77,9 +81,10 @@ public class FourPeaksTest {
                 break;
         }
     }
+
     private static void RHC_funct(EvaluationFunction ef, HillClimbingProblem hcp) {
         RandomizedHillClimbing rhc = new RandomizedHillClimbing(hcp);      
-        FixedIterationTrainer fit = new FixedIterationTrainer(rhc, 200000);
+        FixedIterationTrainer fit = new FixedIterationTrainer(rhc, iters);
         fit.train();
         // System.out.println("RHC: " + ef.value(rhc.getOptimal()));    
         System.out.println(ef.value(rhc.getOptimal()));    
@@ -87,7 +92,7 @@ public class FourPeaksTest {
 
     private static void SA_funct(EvaluationFunction ef, HillClimbingProblem hcp) {
         SimulatedAnnealing sa = new SimulatedAnnealing(1E11, .95, hcp);
-        FixedIterationTrainer fit = new FixedIterationTrainer(sa, 200000);
+        FixedIterationTrainer fit = new FixedIterationTrainer(sa, iters);
         fit.train();
         // System.out.println("SA: " + ef.value(sa.getOptimal()));
         System.out.println(ef.value(sa.getOptimal()));
@@ -96,7 +101,7 @@ public class FourPeaksTest {
     private static void MIMIC_funct(EvaluationFunction ef, Distribution odd, Distribution df) {
         ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
         MIMIC mimic = new MIMIC(200, 20, pop);
-        FixedIterationTrainer fit = new FixedIterationTrainer(mimic, 1000);
+        FixedIterationTrainer fit = new FixedIterationTrainer(mimic, iters);
         fit.train();
         // System.out.println("MIMIC: " + ef.value(mimic.getOptimal()));
         System.out.println(ef.value(mimic.getOptimal()));
@@ -108,7 +113,7 @@ public class FourPeaksTest {
 
         GeneticAlgorithmProblem gap = new GenericGeneticAlgorithmProblem(ef, odd, mf, cf);
         StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(200, 100, 10, gap);
-        FixedIterationTrainer fit = new FixedIterationTrainer(ga, 1000);
+        FixedIterationTrainer fit = new FixedIterationTrainer(ga, iters);
         fit.train();
         // System.out.println("GA: " + ef.value(ga.getOptimal()));
         System.out.println(ef.value(ga.getOptimal()));

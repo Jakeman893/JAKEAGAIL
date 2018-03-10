@@ -35,14 +35,26 @@ import shared.FixedIterationTrainer;
  */
 public class NQueensTest {
     /** The n value */
-    private static final int N = 10;
-    /** The t value */
+    private static int N = 10;
     
+    private static int iters = 1000;
+
     public static void main(String[] args) {
+        int alg = 4;
+        for (int i = 0; i < args.length; i++) {
+            String s = args[i];
+            if (s.equalsIgnoreCase("-N")) {
+                N = Integer.parseInt(args[i+1]);
+            } else if (s.equalsIgnoreCase("-a")){
+                alg = Integer.parseInt(args[i+1]);
+            } else if (s.equalsIgnoreCase("-i")){
+                iters = Integer.parseInt(args[i+1]);
+            }
+        }
         int[] ranges = new int[N];
         Random random = new Random(N);
         for (int i = 0; i < N; i++) {
-        	ranges[i] = random.nextInt();
+        	ranges[i] = Math.abs(random.nextInt());
         }
         NQueensFitnessFunction ef = new NQueensFitnessFunction();
         Distribution odd = new DiscretePermutationDistribution(N);
@@ -54,49 +66,75 @@ public class NQueensTest {
         GeneticAlgorithmProblem gap = new GenericGeneticAlgorithmProblem(ef, odd, mf, cf);
         ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
 
-        System.out.println("===========RHC=========");
+        switch(alg) {
+            case 0:
+                RHC_funct(ef, hcp);
+                break;
+            case 1:
+                SA_funct(ef, hcp);
+                break;
+            case 2:
+                GA_funct(ef, odd, df, ranges);
+                break;
+            case 3:
+                MIMIC_funct(ef, odd, df);
+                break;
+            case 4:
+                RHC_funct(ef, hcp);
+                SA_funct(ef, hcp);
+                GA_funct(ef, odd, df, ranges);
+                MIMIC_funct(ef, odd, df);
+                break;
+        }
 
+    }
+
+    private static void RHC_funct(NQueensFitnessFunction ef, HillClimbingProblem hcp) {
         RandomizedHillClimbing rhc = new RandomizedHillClimbing(hcp);      
-        FixedIterationTrainer fit = new FixedIterationTrainer(rhc, 100);
+        FixedIterationTrainer fit = new FixedIterationTrainer(rhc, iters);
         fit.train();
-        long starttime = System.currentTimeMillis();
-        System.out.println("RHC: " + ef.value(rhc.getOptimal()));
-        System.out.println("RHC: Board Position: ");
-        System.out.println(ef.boardPositions());
-        System.out.println("Time : "+ (System.currentTimeMillis() - starttime));
-        
-        System.out.println("===========Simulated Annealing=========");
-        
-        SimulatedAnnealing sa = new SimulatedAnnealing(1E1, .1, hcp);
-        fit = new FixedIterationTrainer(sa, 100);
+        // System.out.println("RHC: " + ef.value(rhc.getOptimal()));
+        // System.out.println("RHC: Board Position: ");
+        // System.out.println(ef.boardPositions());
+        // System.out.println("RHC: " + ef.value(rhc.getOptimal()));    
+        System.out.println(ef.value(rhc.getOptimal()));    
+    }
+
+    private static void SA_funct(NQueensFitnessFunction ef, HillClimbingProblem hcp) {
+        SimulatedAnnealing sa = new SimulatedAnnealing(1E11, .95, hcp);
+        FixedIterationTrainer fit = new FixedIterationTrainer(sa, iters);
         fit.train();
-        
-        starttime = System.currentTimeMillis();
-        System.out.println("SA: " + ef.value(sa.getOptimal()));
-        System.out.println("SA: Board Position: ");
-        System.out.println(ef.boardPositions());
-        System.out.println("Time : "+ (System.currentTimeMillis() - starttime));
-        
-        System.out.println("===========Genetic Algorithm=========");
-        
-        starttime = System.currentTimeMillis();
+        // System.out.println("SA: " + ef.value(sa.getOptimal()));
+        // System.out.println("SA: Board Position: ");
+        // System.out.println(ef.boardPositions());
+        // System.out.println("SA: " + ef.value(sa.getOptimal()));
+        System.out.println(ef.value(sa.getOptimal()));
+    }
+
+    private static void MIMIC_funct(NQueensFitnessFunction ef, Distribution odd, Distribution df) {
+        ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
+        MIMIC mimic = new MIMIC(200, 20, pop);
+        FixedIterationTrainer fit = new FixedIterationTrainer(mimic, iters);
+        fit.train();
+        // System.out.println("MIMIC: " + ef.value(mimic.getOptimal()));
+        // System.out.println("MIMIC: Board Position: ");
+        // System.out.println(ef.boardPositions());
+        System.out.println(ef.value(mimic.getOptimal()));
+    }
+
+    private static void GA_funct(NQueensFitnessFunction ef, Distribution odd, Distribution df, int[] ranges) {
+        // System.out.println(Arrays.toString(ranges));
+        MutationFunction mf = new SwapMutation();
+        CrossoverFunction cf = new SingleCrossOver();
+
+        GeneticAlgorithmProblem gap = new GenericGeneticAlgorithmProblem(ef, odd, mf, cf);
         StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(200, 0, 10, gap);
-        fit = new FixedIterationTrainer(ga, 100);
+        FixedIterationTrainer fit = new FixedIterationTrainer(ga, iters);
         fit.train();
-        System.out.println("GA: " + ef.value(ga.getOptimal()));
-        System.out.println("GA: Board Position: ");
-        System.out.println(ef.boardPositions());
-        System.out.println("Time : "+ (System.currentTimeMillis() - starttime));
-        
-        System.out.println("===========MIMIC=========");
-        
-        starttime = System.currentTimeMillis();
-        MIMIC mimic = new MIMIC(200, 10, pop);
-        fit = new FixedIterationTrainer(mimic, 5);
-        fit.train();
-        System.out.println("MIMIC: " + ef.value(mimic.getOptimal()));
-        System.out.println("MIMIC: Board Position: ");
-        System.out.println(ef.boardPositions());
-        System.out.println("Time : "+ (System.currentTimeMillis() - starttime));
+        // System.out.println("GA: " + ef.value(ga.getOptimal()));
+        // System.out.println("GA: Board Position: ");
+        // System.out.println(ef.boardPositions());
+        // System.out.println("Time : "+ (System.currentTimeMillis() - starttime));
+        System.out.println(ef.value(ga.getOptimal()));
     }
 }

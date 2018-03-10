@@ -52,6 +52,8 @@ public class KnapsackTest {
     /** The maximum weight for the knapsack */
     private static double MAX_KNAPSACK_WEIGHT = 0;
 
+    private static int iters = 1000;
+
     /**
      * The test main
      * @param args ignored
@@ -71,6 +73,8 @@ public class KnapsackTest {
                 MAX_WEIGHT = Integer.parseInt(args[i+1]);
             } else if (s.equalsIgnoreCase("-a")){
                 alg = Integer.parseInt(args[i+1]);
+            } else if (s.equalsIgnoreCase("-i")){
+                iters = Integer.parseInt(args[i+1]);
             }
         }
 
@@ -123,7 +127,7 @@ public class KnapsackTest {
 
     private static void RHC_funct(EvaluationFunction ef, HillClimbingProblem hcp) {
         RandomizedHillClimbing rhc = new RandomizedHillClimbing(hcp);      
-        FixedIterationTrainer fit = new FixedIterationTrainer(rhc, 200000);
+        FixedIterationTrainer fit = new FixedIterationTrainer(rhc, iters);
         fit.train();
         // System.out.println("RHC: " + ef.value(rhc.getOptimal()));    
         System.out.println(ef.value(rhc.getOptimal()));    
@@ -131,7 +135,7 @@ public class KnapsackTest {
 
     private static void SA_funct(EvaluationFunction ef, HillClimbingProblem hcp) {
         SimulatedAnnealing sa = new SimulatedAnnealing(100, .95, hcp);
-        FixedIterationTrainer fit = new FixedIterationTrainer(sa, 200000);
+        FixedIterationTrainer fit = new FixedIterationTrainer(sa, iters);
         fit.train();
         // System.out.println("SA: " + ef.value(sa.getOptimal()));
         System.out.println(ef.value(sa.getOptimal()));
@@ -140,7 +144,7 @@ public class KnapsackTest {
     private static void MIMIC_funct(EvaluationFunction ef, Distribution odd, Distribution df) {
         ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
         MIMIC mimic = new MIMIC(200, 20, pop);
-        FixedIterationTrainer fit = new FixedIterationTrainer(mimic, 1000);
+        FixedIterationTrainer fit = new FixedIterationTrainer(mimic, iters);
         fit.train();
         // System.out.println("MIMIC: " + ef.value(mimic.getOptimal()));
         System.out.println(ef.value(mimic.getOptimal()));
@@ -152,7 +156,7 @@ public class KnapsackTest {
 
         GeneticAlgorithmProblem gap = new GenericGeneticAlgorithmProblem(ef, odd, mf, cf);
         StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(200, 100, 10, gap);
-        FixedIterationTrainer fit = new FixedIterationTrainer(ga, 1000);
+        FixedIterationTrainer fit = new FixedIterationTrainer(ga, iters);
         fit.train();
         // System.out.println("GA: " + ef.value(ga.getOptimal()));
         System.out.println(ef.value(ga.getOptimal()));

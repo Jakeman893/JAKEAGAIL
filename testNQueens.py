@@ -25,32 +25,31 @@ else:
 file_name = ""
 
 if not maxIters:
-    data = {'a': [], 'N': [], 't': [], 'time': [], 'score': []}
-    file_name = "logs/FourPeaksExhaustive.log"
+    data = {'a': [], 'N': [], 'time': [], 'score': []}
+    file_name = "logs/NQueensExhaustive.log"
     for a in range(0, 4):
-        for N in range(10, maxN+1, 10):
-            for t in range(0, N, 5):
-                print(str(a) + '\t' + str(N) + '\t' + str(t))
-                data['a'].append(algs[a])
-                data['N'].append(N)
-                data['t'].append(t)
-                time1 = time.time()
-                proc = subprocess.Popen("java -cp ABAGAIL.jar opt.test.FourPeaksTest -a " + str(a) + 
-                                        " -t " + str(t) + " -N " + str(N),
-                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-                out, err = proc.communicate()
-                time2 = time.time()
-                data['time'].append((time2-time1) * 1000.0)
-                data['score'].append(float(out.strip()))
+        for N in range(10, maxN+1, 1):
+            # print(str(a) + '\t' + str(N))
+            data['a'].append(algs[a])
+            data['N'].append(N)
+            time1 = time.time()
+            proc = subprocess.Popen("java -cp ABAGAIL.jar opt.test.NQueensTest -a " + str(a) + 
+                                    " -N " + str(N),
+                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+            out, err = proc.communicate()
+            # print(out)
+            time2 = time.time()
+            data['time'].append((time2-time1) * 1000.0)
+            data['score'].append(float(out.strip()))
 else:
     data = {'a': [], 'iters': [], 'time': [], 'score': []}
-    file_name = "logs/FourPeaksIterations.log"
+    file_name = "logs/NQueensIterations.log"
     for a in range(0,4):
         for i in range(1, maxIters, step):
             data['a'].append(algs[a])
             data['iters'].append(i)
             time1 = time.time()
-            proc = subprocess.Popen("java -cp ABAGAIL.jar opt.test.FourPeaksTest -i " + str(i) + " -a " + str(a),
+            proc = subprocess.Popen("java -cp ABAGAIL.jar opt.test.NQueensTest -i " + str(i) + " -a " + str(a),
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
             out, err = proc.communicate()
             time2 = time.time()
