@@ -40,7 +40,7 @@ import shared.FixedIterationTrainer;
  */
 public class KnapsackTest {
     /** Random number generator */
-    private static Random random = new Random();
+    private static Random random = new Random(0xABCD);
     /** The number of items */
     private static int NUM_ITEMS = 40;
     /** The number of copies each */
@@ -53,6 +53,14 @@ public class KnapsackTest {
     private static double MAX_KNAPSACK_WEIGHT = 0;
 
     private static int iters = 1000;
+    private static int temp = 100;
+    private static double decay = 0.95;
+    private static int samples = 200;
+    private static int toKeep = 20;
+    private static int popSize = 200;
+    private static int toMutate = 10;
+    private static int toMate = 100;
+
 
     /**
      * The test main
@@ -75,6 +83,20 @@ public class KnapsackTest {
                 alg = Integer.parseInt(args[i+1]);
             } else if (s.equalsIgnoreCase("-i")){
                 iters = Integer.parseInt(args[i+1]);
+            } else if (s.equalsIgnoreCase("-temp")) {
+                temp = Integer.parseInt(args[i+1]);
+            } else if (s.equalsIgnoreCase("-decay")) {
+                decay = Double.parseDouble(args[i+1]);
+            } else if (s.equalsIgnoreCase("-samples")) {
+                samples = Integer.parseInt(args[i+1]);
+            } else if (s.equalsIgnoreCase("-toKeep")) {
+                toKeep = Integer.parseInt(args[i+1]);
+            } else if (s.equalsIgnoreCase("-popSize")) {
+                popSize = Integer.parseInt(args[i+1]);
+            } else if (s.equalsIgnoreCase("-toMutate")) {
+                toMutate = Integer.parseInt(args[i+1]);
+            } else if (s.equalsIgnoreCase("-toMate")) {
+                toMate = Integer.parseInt(args[i+1]);
             }
         }
 
@@ -95,13 +117,9 @@ public class KnapsackTest {
         Distribution odd = new DiscreteUniformDistribution(ranges);
         NeighborFunction nf = new DiscreteChangeOneNeighbor(ranges);
 
-        MutationFunction mf = new DiscreteChangeOneMutation(ranges);
-        CrossoverFunction cf = new UniformCrossOver();
         Distribution df = new DiscreteDependencyTree(.1, ranges);
 
         HillClimbingProblem hcp = new GenericHillClimbingProblem(ef, odd, nf);
-        GeneticAlgorithmProblem gap = new GenericGeneticAlgorithmProblem(ef, odd, mf, cf);
-        ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
         
         switch(alg) {
             case 0:
@@ -134,7 +152,7 @@ public class KnapsackTest {
     }
 
     private static void SA_funct(EvaluationFunction ef, HillClimbingProblem hcp) {
-        SimulatedAnnealing sa = new SimulatedAnnealing(100, .95, hcp);
+        SimulatedAnnealing sa = new SimulatedAnnealing(temp, decay, hcp);
         FixedIterationTrainer fit = new FixedIterationTrainer(sa, iters);
         fit.train();
         // System.out.println("SA: " + ef.value(sa.getOptimal()));
@@ -143,7 +161,7 @@ public class KnapsackTest {
 
     private static void MIMIC_funct(EvaluationFunction ef, Distribution odd, Distribution df) {
         ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
-        MIMIC mimic = new MIMIC(200, 20, pop);
+        MIMIC mimic = new MIMIC(samples, toKeep, pop);
         FixedIterationTrainer fit = new FixedIterationTrainer(mimic, iters);
         fit.train();
         // System.out.println("MIMIC: " + ef.value(mimic.getOptimal()));
@@ -155,7 +173,7 @@ public class KnapsackTest {
         CrossoverFunction cf = new UniformCrossOver();
 
         GeneticAlgorithmProblem gap = new GenericGeneticAlgorithmProblem(ef, odd, mf, cf);
-        StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(200, 100, 10, gap);
+        StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(popSize, toMate, toMutate, gap);
         FixedIterationTrainer fit = new FixedIterationTrainer(ga, iters);
         fit.train();
         // System.out.println("GA: " + ef.value(ga.getOptimal()));

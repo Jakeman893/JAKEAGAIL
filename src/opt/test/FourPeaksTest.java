@@ -37,6 +37,13 @@ public class FourPeaksTest {
     private static int T = N / 5;
 
     private static int iters = 1000;
+    private static int temp = 100;
+    private static double decay = 0.95;
+    private static int samples = 200;
+    private static int toKeep = 20;
+    private static int popSize = 200;
+    private static int toMutate = 10;
+    private static int toMate = 100;
     
     public static void main(String[] args) {
         int alg = 4;
@@ -50,6 +57,20 @@ public class FourPeaksTest {
                 alg = Integer.parseInt(args[i+1]);
             } else if (s.equalsIgnoreCase("-i")){
                 iters = Integer.parseInt(args[i+1]);
+            }   else if (s.equalsIgnoreCase("-temp")) {
+                temp = Integer.parseInt(args[i+1]);
+            } else if (s.equalsIgnoreCase("-decay")) {
+                decay = Double.parseDouble(args[i+1]);
+            } else if (s.equalsIgnoreCase("-samples")) {
+                samples = Integer.parseInt(args[i+1]);
+            } else if (s.equalsIgnoreCase("-toKeep")) {
+                toKeep = Integer.parseInt(args[i+1]);
+            } else if (s.equalsIgnoreCase("-popSize")) {
+                popSize = Integer.parseInt(args[i+1]);
+            } else if (s.equalsIgnoreCase("-toMutate")) {
+                toMutate = Integer.parseInt(args[i+1]);
+            } else if (s.equalsIgnoreCase("-toMate")) {
+                toMate = Integer.parseInt(args[i+1]);
             }
         }
         int[] ranges = new int[N];
@@ -91,7 +112,7 @@ public class FourPeaksTest {
     }
 
     private static void SA_funct(EvaluationFunction ef, HillClimbingProblem hcp) {
-        SimulatedAnnealing sa = new SimulatedAnnealing(1E11, .95, hcp);
+        SimulatedAnnealing sa = new SimulatedAnnealing(temp, decay, hcp);
         FixedIterationTrainer fit = new FixedIterationTrainer(sa, iters);
         fit.train();
         // System.out.println("SA: " + ef.value(sa.getOptimal()));
@@ -100,7 +121,7 @@ public class FourPeaksTest {
 
     private static void MIMIC_funct(EvaluationFunction ef, Distribution odd, Distribution df) {
         ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
-        MIMIC mimic = new MIMIC(200, 20, pop);
+        MIMIC mimic = new MIMIC(samples, toKeep, pop);
         FixedIterationTrainer fit = new FixedIterationTrainer(mimic, iters);
         fit.train();
         // System.out.println("MIMIC: " + ef.value(mimic.getOptimal()));
@@ -112,7 +133,7 @@ public class FourPeaksTest {
         CrossoverFunction cf = new SingleCrossOver();
 
         GeneticAlgorithmProblem gap = new GenericGeneticAlgorithmProblem(ef, odd, mf, cf);
-        StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(200, 100, 10, gap);
+        StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(popSize, toMate, toMutate, gap);
         FixedIterationTrainer fit = new FixedIterationTrainer(ga, iters);
         fit.train();
         // System.out.println("GA: " + ef.value(ga.getOptimal()));

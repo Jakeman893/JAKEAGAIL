@@ -13,3 +13,4 @@ manifest.mf
 *.java~
 datasets/
 logs/
+*.pyc

@@ -28,7 +28,7 @@ import java.util.*;
 public class WineTest {
 
 
-  
+
 
   /* Dataset Params */
   /**
@@ -159,58 +159,75 @@ public class WineTest {
    * @param args ignored
    */
   public static void main(String[] args) {
-    initializeInstances();
+    int iters = 1000;
+    int alg = 4;
 
-//    Creates K-folds for cross-validation
+    
+    initializeInstances();
+    //    Creates K-folds for cross-validation
     makeTestTrainSets();
     folds = kfolds(trainSet);
 
-    int trainIterations;
-
-//    Determine best NN params, which happen to just be the number of hidden layer nodes.
-    if (shouldFindNNParams) {
-//      TODO: Tweak this value for better results
-
-//      This is how Weka does it: # of attributes + # of classes / 2
-      int weka_technique = num_attributes + outputLayer / 2;
-      int[] hiddenLayerNodes = {weka_technique, 5, 10, 20, 50, 100, 200};
-      trainIterations = 200;
-      determineNNParams(trainIterations, hiddenLayerNodes);
+    for (int i = 0; i < args.length; i++) {
+        String s = args[i];
+        if (s.equalsIgnoreCase("-a")){
+            alg = Integer.parseInt(args[i+1]);
+        } else if (s.equalsIgnoreCase("-i")){
+            iters = Integer.parseInt(args[i+1]);
+        }  else if (s.equalsIgnoreCase("-temp")) {
+            best_temp = Double.parseDouble(args[i+1]);
+        } else if (s.equalsIgnoreCase("-decay")) {
+            best_cooling = Double.parseDouble(args[i+1]);
+        } else if (s.equalsIgnoreCase("-popSize")) {
+            populationRatio = Double.parseDouble(args[i+1]);
+        } else if (s.equalsIgnoreCase("-toMutate")) {
+            toMutateRatio = Double.parseDouble(args[i+1]);
+        } else if (s.equalsIgnoreCase("-toMate")) {
+            toMateRatio = Double.parseDouble(args[i+1]);
+        }
     }
 
+    switch(alg) {
+        case 0:
+            runRHC(iters);
+            break;
+        case 1:
+            /* SA */
+            if (shouldFindSAParams) {
+                determineSAParams(iters);
+            }
+  
+            runSA(iters, best_temp, best_cooling);
+            break;
+        case 2:
 
-    /* Backprop */
-    trainIterations = 200;
-//    Now determine the NN performance. Results are simply printed out.
-    runBackprop(trainIterations);
+            /* GA */
+            if (shouldFindGAParams) {
+            //      TODO: Keep this very small
+                determineGAParams(iters);
+            }
+            runGA(iters);
+            break;
+        case 3:
+            //    Determine best NN params, which happen to just be the number of hidden layer nodes.
+            if (shouldFindNNParams) {
+                //      TODO: Tweak this value for better results
 
-
-    /* RHC */
-    trainIterations = 2000;
-//    RHC has no params. Just run it directly
-    runRHC(trainIterations);
-
-
-    /* SA */
-    if (shouldFindSAParams) {
-      trainIterations = 100;
-      determineSAParams(trainIterations);
+                //      This is how Weka does it: # of attributes + # of classes / 2
+                int weka_technique = num_attributes + outputLayer / 2;
+                int[] hiddenLayerNodes = {weka_technique, 5, 10, 20, 50, 100, 200};
+                determineNNParams(iters, hiddenLayerNodes);
+            }
+            runBackprop(iters);
+        break;
+        case 4:
+            runRHC(iters);
+            runSA(iters, best_temp, best_cooling);
+            runGA(iters);
+            runBackprop(iters);
+            break;
     }
-    // Run actual SA with best params here
-    trainIterations = 2000;
-    runSA(trainIterations, best_temp, best_cooling);
 
-    /* GA */
-    if (shouldFindGAParams) {
-//      TODO: Keep this very small
-      trainIterations = 20;
-      determineGAParams(trainIterations);
-
-    }
-
-//    Run actual GA with best params here
-    trainIterations = 20;
-    runGA(trainIterations);
   }
 
 
@@ -222,7 +239,7 @@ public class WineTest {
    */
   public static void determineNNParams(int trainIterations, int[] hiddenLayerNodes) {
 
-    System.out.println("===========Cross Validation for NN Params=========");
+    // System.out.println("===========Cross Validation for NN Params=========");
     double[] errors = new double[hiddenLayerNodes.length];
     for (int m = 0; m < hiddenLayerNodes.length; m++) {
 
@@ -254,7 +271,7 @@ public class WineTest {
         validationErrors[i] = evaluateNetwork(backpropNet, validation);
       }
 
-      System.out.print(Arrays.toString(validationErrors));
+    //   System.out.print(Arrays.toString(validationErrors));
 
 //      Find the average error for this network configuration
       double error = 0;
@@ -294,10 +311,10 @@ public class WineTest {
    */
   public static void runBackprop(int trainIterations) {
 
-    System.out.println("===========Backpropagation=========");
+    // System.out.println("===========Backpropagation=========");
 
-    double starttime = System.nanoTime();;
-    double endtime;
+    // double starttime = System.nanoTime();;
+    // double endtime;
 
     BackPropagationNetwork backpropNet = factory.createClassificationNetwork(
         new int[]{inputLayer, numberHiddenLayerNodes, outputLayer});
@@ -312,15 +329,17 @@ public class WineTest {
     double trainError = evaluateNetwork(backpropNet, trainSet.getInstances());
     double testError = evaluateNetwork(backpropNet, testSet.getInstances());
 
-    System.out.printf("Train Error: %s%% %n", df.format(trainError));
-    System.out.printf("Test Error: %s%% %n", df.format(testError));
+    System.out.printf("%s, %s", df.format(trainError), df.format(testError));
 
-    endtime = System.nanoTime();
-    double time_elapsed = endtime - starttime;
+    // System.out.printf("Train Error: %s%% %n", df.format(trainError));
+    // System.out.printf("Test Error: %s%% %n", df.format(testError));
+
+    // endtime = System.nanoTime();
+    // double time_elapsed = endtime - starttime;
 
 //    Convert nanoseconds to seconds
-    time_elapsed /= Math.pow(10,9);
-    System.out.printf("Time Elapsed: %s s %n", df.format(time_elapsed));
+    // time_elapsed /= Math.pow(10,9);
+    // System.out.printf("Time Elapsed: %s s %n", df.format(time_elapsed));
 
   }
 
@@ -333,10 +352,10 @@ public class WineTest {
    */
   public static void runRHC(int trainIterations) {
 
-    System.out.println("===========Randomized Hill Climbing=========");
+    // System.out.println("===========Randomized Hill Climbing=========");
 
-    double starttime = System.nanoTime();;
-    double endtime;
+    // double starttime = System.nanoTime();;
+    // double endtime;
 
     BackPropagationNetwork backpropNet = factory.createClassificationNetwork(
         new int[]{inputLayer, numberHiddenLayerNodes, outputLayer});
@@ -352,22 +371,24 @@ public class WineTest {
     double trainError = evaluateNetwork(backpropNet, trainSet.getInstances());
     double testError = evaluateNetwork(backpropNet, testSet.getInstances());
 
-    System.out.printf("Train Error: %s%% %n", df.format(trainError));
-    System.out.printf("Test Error: %s%% %n", df.format(testError));
+    System.out.printf("%s, %s", df.format(trainError), df.format(testError));
 
-    endtime = System.nanoTime();
-    double time_elapsed = endtime - starttime;
+//     System.out.printf("Train Error: %s%% %n", df.format(trainError));
+//     System.out.printf("Test Error: %s%% %n", df.format(testError));
 
-//    Convert nanoseconds to seconds
-    time_elapsed /= Math.pow(10,9);
-    System.out.printf("Time Elapsed: %s s %n", df.format(time_elapsed));
+//     endtime = System.nanoTime();
+//     double time_elapsed = endtime - starttime;
+
+// //    Convert nanoseconds to seconds
+//     time_elapsed /= Math.pow(10,9);
+//     System.out.printf("Time Elapsed: %s s %n", df.format(time_elapsed));
 
   }
 
 
   public static void determineSAParams(int trainIterations) {
 
-    System.out.println("===========Determining Simulated Annealing Params=========");
+    // System.out.println("===========Determining Simulated Annealing Params=========");
 
     double[][] errors = new double[temps.length][coolingRates.length];
 
@@ -404,7 +425,7 @@ public class WineTest {
           validationErrors[i] = evaluateNetwork(backpropNet, validation);
         }
 
-        System.out.print(Arrays.toString(validationErrors));
+        // System.out.print(Arrays.toString(validationErrors));
 
 //      Find the average error for this network configuration
         double error = 0;
@@ -443,10 +464,10 @@ public class WineTest {
 
   public static void runSA(int trainIterations, double temp, double cooling) {
 
-    System.out.println("===========Simulated Annealing=========");
+    // System.out.println("===========Simulated Annealing=========");
 
-    double starttime = System.nanoTime();;
-    double endtime;
+    // double starttime = System.nanoTime();;
+    // double endtime;
 
     BackPropagationNetwork backpropNet = factory.createClassificationNetwork(
         new int[]{inputLayer, numberHiddenLayerNodes, outputLayer});
@@ -462,21 +483,23 @@ public class WineTest {
     double trainError = evaluateNetwork(backpropNet, trainSet.getInstances());
     double testError = evaluateNetwork(backpropNet, testSet.getInstances());
 
-    System.out.printf("Train Error: %s%% %n", df.format(trainError));
-    System.out.printf("Test Error: %s%% %n", df.format(testError));
+    System.out.printf("%s, %s", df.format(trainError), df.format(testError));
 
-    endtime = System.nanoTime();
-    double time_elapsed = endtime - starttime;
+//     System.out.printf("Train Error: %s%% %n", df.format(trainError));
+//     System.out.printf("Test Error: %s%% %n", df.format(testError));
 
-//    Convert nanoseconds to seconds
-    time_elapsed /= Math.pow(10,9);
-    System.out.printf("Time Elapsed: %s s %n", df.format(time_elapsed));
+//     endtime = System.nanoTime();
+//     double time_elapsed = endtime - starttime;
+
+// //    Convert nanoseconds to seconds
+//     time_elapsed /= Math.pow(10,9);
+//     System.out.printf("Time Elapsed: %s s %n", df.format(time_elapsed));
   }
 
 
   public static void determineGAParams(int trainIterations) {
 
-    System.out.println("===========Determining Genetic Algorithms Params=========");
+    // System.out.println("===========Determining Genetic Algorithms Params=========");
 
     double[][][] errors =
         new double[populationRatios.length][mateRatios.length][mutateRatios.length];
@@ -575,10 +598,10 @@ public class WineTest {
    */
   public static void runGA(int trainIterations) {
 
-    System.out.println("===========Genetic Algorithms=========");
+    // System.out.println("===========Genetic Algorithms=========");
 
-    double starttime = System.nanoTime();
-    double endtime;
+    // double starttime = System.nanoTime();
+    // double endtime;
 
     int trainSetSize = trainSet.size();
     int populationSize = (int) (trainSetSize * populationRatio);
@@ -599,15 +622,17 @@ public class WineTest {
     double trainError = evaluateNetwork(backpropNet, trainSet.getInstances());
     double testError = evaluateNetwork(backpropNet, testSet.getInstances());
 
-    System.out.printf("Train Error: %s%% %n", df.format(trainError));
-    System.out.printf("Test Error: %s%% %n", df.format(testError));
+    System.out.printf("%s, %s", df.format(trainError), df.format(testError));
 
-    endtime = System.nanoTime();
-    double time_elapsed = endtime - starttime;
+    // System.out.printf("Train Error: %s%% %n", df.format(trainError));
+    // System.out.printf("Test Error: %s%% %n", df.format(testError));
 
-//    Convert nanoseconds to seconds
-    time_elapsed /= Math.pow(10,9);
-    System.out.printf("Time Elapsed: %s s %n", df.format(time_elapsed));
+//     endtime = System.nanoTime();
+//     double time_elapsed = endtime - starttime;
+
+// //    Convert nanoseconds to seconds
+//     time_elapsed /= Math.pow(10,9);
+//     System.out.printf("Time Elapsed: %s s %n", df.format(time_elapsed));
   }
 
   /**

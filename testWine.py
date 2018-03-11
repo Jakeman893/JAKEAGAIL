@@ -2,26 +2,21 @@ import os
 import sys
 import subprocess
 import pandas as pd
-import numpy as np
 import time
+import numpy as np
 
 algs = ['RHC', 'SA', 'GA', 'MIMIC']
 
 args = {}
 maxN = 10
-max_val = 50
-max_weight = 50
 maxIters = 0
 step = 1
 a = 5
+
 if len(sys.argv) > 1:
     for i in range(1, len(sys.argv)):
         if '-maxN' in sys.argv[i]:
             maxN = int(sys.argv[i+1])
-        elif '-maxVal' in sys.argv[i]:
-            max_val = int(sys.argv[i+1])
-        elif '-maxW' in sys.argv[i]:
-            max_weight = int(sys.argv[i+1])
         elif '-iters' in sys.argv[i]:
             maxIters = int(sys.argv[i+1])
         elif '-step' in sys.argv[i]:
@@ -34,30 +29,25 @@ else:
 file_name = ""
 
 if not maxIters and a == 5:
-    file_name = "logs/KnapsackExhaustive.log"
-    data = {'a': [], 'n': [], 'c': [], 'max_val': [], 'max_weight': [], 'time': [], 'score': []}
+    data = {'a': [], 'N': [], 't': [], 'time': [], 'score': []}
+    file_name = "logs/WineExhaustive.log"
     for a in range(0, 4):
-        for n in range(10, maxN+1, 10):
-            for c in range(0, 5):
-                # for max_val in xrange(0,50, 5):
-                #     for max_weight in xrange(0,50,5):
-                print(str(a) + '\t' + str(n) + '\t' + str(c) + '\t' + str(max_val) + '\t' + str(max_weight))
+        for N in range(10, maxN+1, 10):
+            for t in range(0, N, 5):
+                print(str(a) + '\t' + str(N) + '\t' + str(t))
                 data['a'].append(algs[a])
-                data['n'].append(n)
-                data['c'].append(c)
-                data['max_val'].append(max_val)
-                data['max_weight'].append(max_weight)
+                data['N'].append(N)
+                data['t'].append(t)
                 time1 = time.time()
-                proc = subprocess.Popen("java -cp ABAGAIL.jar opt.test.KnapsackTest -a " + str(a) + 
-                                        " -c " + str(c) + " -n " + str(n) + " -max_val " + str(max_val) + 
-                                        " -max_weight " + str(max_weight),
+                proc = subprocess.Popen("java -cp ABAGAIL.jar opt.test.WineTest -a " + str(a) + 
+                                        " -t " + str(t) + " -N " + str(N),
                                         stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
                 out, err = proc.communicate()
                 time2 = time.time()
                 data['time'].append((time2-time1) * 1000.0)
                 data['score'].append(float(out.strip()))
 elif a != 5:
-    file_name = "logs/Knapsack" + algs[a] + "Tests.log"
+    file_name = "logs/Wine" + algs[a] + "Tests.log"
     args['a'] = a
     var_a = None
     var_b = None
@@ -124,12 +114,12 @@ elif a != 5:
                 time1 = time.time()
                 if var_c:
                     data[var_c].append(k)
-                    proc = subprocess.Popen("java -cp ABAGAIL.jar opt.test.KnapsackTest -a " + str(a) + 
+                    proc = subprocess.Popen("java -cp ABAGAIL.jar opt.test.WineTest -a " + str(a) + 
                                             " " + var_a + " " + str(i) + " " + var_b + " " + str(j) + 
                                             " " + var_c + " " + str(k),
                                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
                 else:
-                    proc = subprocess.Popen("java -cp ABAGAIL.jar opt.test.KnapsackTest -a " + str(a) + 
+                    proc = subprocess.Popen("java -cp ABAGAIL.jar opt.test.WineTest -a " + str(a) + 
                                             " " + var_a + " " + str(i) + " " + var_b + " " + str(j),
                                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
                 out, err = proc.communicate()
@@ -138,20 +128,27 @@ elif a != 5:
                 data['score'].append(float(out.strip()))
     
 elif maxIters:
-    data = {'a': [], 'iters': [], 'time': [], 'score': []}
-    file_name = "logs/KnapsackIterations.log"
+    data = {'a': [], 'iters': [], 'time': [], 'train_err': [], 'test_err': []}
+    file_name = "logs/WineIterations.log"
     for a in range(0,4):
-        for i in range(1, maxIters, step):
+        # if a > 1:
+        #     rng = range(1, min(maxIters, 20), 1)
+        # else:
+        rng = range(1, maxIters, step)
+        for i in rng:
             print(algs[a] + "\t" + str(i))
             data['a'].append(algs[a])
             data['iters'].append(i)
             time1 = time.time()
-            proc = subprocess.Popen("java -cp ABAGAIL.jar opt.test.KnapsackTest -i " + str(i) + " -a " + str(a),
+            proc = subprocess.Popen("java -cp ABAGAIL.jar opt.test.WineTest -i " + str(i) + " -a " + str(a),
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
             out, err = proc.communicate()
             time2 = time.time()
+            out = out.strip().split(', ')
+            data['train_err'].append(float(out[0]) / 100)
+            data['test_err'].append(float(out[1]) / 100)
             data['time'].append((time2-time1) * 1000.0)
-            data['score'].append(float(out.strip())) 
+    
 
 df = pd.DataFrame(data)
 
